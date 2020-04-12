@@ -7,16 +7,16 @@ from utils.ACBird import ACBird
 from utils.ACBirdParser import ACBirdParser
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class ACBirdCommand(ACBird):
 
-    def __init__(self, socket_file: str):
-        super().__init__(socket_file)
+    def __init__(self, socket_file: str, **kwargs):
+        super().__init__(socket_file, **kwargs)
 
     @staticmethod
     def _verify_ip_network(network):
+        logger.debug(f"[Network] {network}")
         if not network:
             return
         regex_network = re.compile(r"^.*\d+$")
@@ -35,6 +35,7 @@ class ACBirdCommand(ACBird):
 
     @staticmethod
     def _is_valid_protocol(protocol_name):
+        logger.debug(f"[Protocol nam] {protocol_name}")
         if not protocol_name:
             return
         regex_protocol_name = re.compile(r"^[A-Za-z_0-9]+$")
@@ -42,6 +43,7 @@ class ACBirdCommand(ACBird):
 
     @staticmethod
     def _is_valid_asn(asn):
+        logger.debug(f"ASN: {asn}")
         if not asn:
             return False
         try:
@@ -52,6 +54,7 @@ class ACBirdCommand(ACBird):
 
     @staticmethod
     def _is_valid_community(community):
+        logger.debug(f"[Community] {community}")
         if not community:
             return False
         regex_community = re.compile(r"^\((?P<left>[0-9]{1,5}):(?P<right>[0-9]{1,5})\)$")
@@ -59,10 +62,12 @@ class ACBirdCommand(ACBird):
         if not match:
             return False
         left, right = match.group("left", "right")
+        logger.debug(f"[Community] left:{left} right:{right}")
         return 0 <= int(left) < 2**16 and 0 <= int(right) < 2**16
 
     @staticmethod
     def _is_valid_large_community(community):
+        logger.debug(f"[Large community]: {community}")
         if not community:
             return False
         regex_community = re.compile(r"^\((?P<left>[0-9]{1,10}):(?P<middle>[0-9]{1,10}):(?P<right>[0-9]{1,10})\)$")
@@ -70,7 +75,7 @@ class ACBirdCommand(ACBird):
         if not match:
             return False
         left, middle, right = match.group("left", "middle", "right")
-        print(left, middle, right)
+        logger.debug(f"[Large community] left:{left} middle:{middle} right:{right}")
         return 0 <= int(left) < 2**32 and 0 <= int(middle) < 2**32 and 0 <= int(right) < 2**32
 
     @staticmethod
@@ -81,6 +86,7 @@ class ACBirdCommand(ACBird):
 
     def _return_route_parsed_with_data(self, data, detail=False):
         if not self._is_valid_data(data):
+            logger.debug(f"[Data] not valid")
             return
         if detail:
             return ACBirdParser.parse_route_list(data.get("text"))
@@ -89,6 +95,7 @@ class ACBirdCommand(ACBird):
 
     def get_protocol_list(self):
         command = "show protocols"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         if not self._is_valid_data:
             return
@@ -96,6 +103,7 @@ class ACBirdCommand(ACBird):
 
     def get_protocol(self, protocol_name):
         command = f"show protocols {protocol_name}"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         if not self._is_valid_data:
             return
@@ -103,6 +111,7 @@ class ACBirdCommand(ACBird):
 
     def get_protocol_detail(self, protocol_name):
         command = f"show protocols all {protocol_name}"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         if not self._is_valid_data:
             return
@@ -115,6 +124,7 @@ class ACBirdCommand(ACBird):
         command = f"show route for {valid_network}"
         if detail:
             command = f"{command} all"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         return self._return_route_parsed_with_data(data, detail=detail)
 
@@ -126,6 +136,7 @@ class ACBirdCommand(ACBird):
         command = f"show route for {valid_network} protocol {protocol_name}"
         if detail:
             command = f"{command} all"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         return self._return_route_parsed_with_data(data, detail=detail)
 
@@ -136,6 +147,7 @@ class ACBirdCommand(ACBird):
         command = f"show route where bgp_path.first = {asn}"
         if detail:
             command = f"{command} all"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         return self._return_route_parsed_with_data(data, detail=detail)
 
@@ -146,6 +158,7 @@ class ACBirdCommand(ACBird):
         command = f"show route where bgp_path.last = {asn}"
         if detail:
             command = f"{command} all"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         return self._return_route_parsed_with_data(data, detail=detail)
 
@@ -156,6 +169,7 @@ class ACBirdCommand(ACBird):
         command = f"show route where {community} ~ bgp_community"
         if detail:
             command = f"{command} all"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         return self._return_route_parsed_with_data(data, detail=detail)
 
@@ -166,5 +180,6 @@ class ACBirdCommand(ACBird):
         command = f"show route where {community} ~ bgp_large_community"
         if detail:
             command = f"{command} all"
+        logger.debug(f"[Command] {command}")
         data = self.execute_cmd(command)
         return self._return_route_parsed_with_data(data, detail=detail)

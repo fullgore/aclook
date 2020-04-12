@@ -23,7 +23,6 @@ from utils.constants import \
     DICT_BIRD_ROUTE
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class NestedProtocolSchema(Schema):

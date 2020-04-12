@@ -6,7 +6,6 @@ from marshmallow import Schema, fields
 from .constants import *
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class BirdMessage(Schema):

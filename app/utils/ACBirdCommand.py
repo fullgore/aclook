@@ -83,9 +83,9 @@ class ACBirdCommand(ACBird):
         if not self._is_valid_data(data):
             return
         if detail:
-            ACBirdParser.parse_route_list(data.get("text"))
+            return ACBirdParser.parse_route_list(data.get("text"))
         else:
-            ACBirdParser.parse_nested_route_list(data.get("text"))
+            return ACBirdParser.parse_nested_route_list(data.get("text"))
 
     def get_protocol_list(self):
         command = "show protocols"

@@ -19,7 +19,8 @@ def init_app(app):
 
 class AppServiceContainer(containers.DeclarativeContainer):
     bird_socket = providers.Dependency(instance_of=str)
-    bird_cmd = providers.Factory(ACBirdCommand, socket_file=bird_socket)
+    bird_timeout = providers.Dependency(instance_of=float)
+    bird_cmd = providers.Factory(ACBirdCommand, socket_file=bird_socket, timeout=bird_timeout)
 
 
 appSC = AppServiceContainer()

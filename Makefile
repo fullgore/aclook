@@ -18,7 +18,7 @@ app-lint:
 	cd app && env FLASK_ENV=testing $(FLAKE8) --ignore=E501,E999 --exclude migrations,tests $(FLAKE8_ARGS)
 
 app-run:
-	cd app && env FLASK_ENV=development python3 run.py
+	cd app && env FLASK_ENV=development gunicorn -w 4 wsgi:app -b 0.0.0.0:8179
 
 app-tests:
 	cd app && env FLASK_ENV=testing $(PYTEST) $(PYTEST_ARGS)

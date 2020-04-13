@@ -1,6 +1,6 @@
 import logging
 
-from socket import socket, AF_UNIX, SOCK_STREAM
+from socket import socket, AF_UNIX, SOCK_STREAM, timeout
 from marshmallow import Schema, fields
 
 from .constants import *
@@ -16,9 +16,9 @@ class BirdMessage(Schema):
 
 class ACBird:
 
-    def __init__(self, socket_file: str, timeout=3., buffer_size=8192):
+    def __init__(self, socket_file: str, socket_timeout=3., buffer_size=4096):
         self._socket_file = socket_file
-        self._timeout = timeout
+        self._timeout = socket_timeout
         self._buffer_size = buffer_size
         self._socket = None
 
@@ -169,7 +169,14 @@ class ACBird:
 
         while current_code not in BIRD_RETURN_CODE:
             # read the buffer
-            bytes_data = self._socket.recv(self._buffer_size)
+            try:
+                bytes_data = self._socket.recv(self._buffer_size)
+            except timeout:
+                logger.error(f"Socket timeout (> {self._timeout})")
+                result["valid"] = False
+                result["warning"] = "Timeout issue"
+                return result
+
             buffer = bytes.decode(bytes_data, 'utf-8')
 
             # Split lines (+ the end of the last buffer)

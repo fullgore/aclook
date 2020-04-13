@@ -30,4 +30,4 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    BIRD_TIMEOUT = 7.
+    BIRD_TIMEOUT = 20.

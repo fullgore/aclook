@@ -83,6 +83,7 @@ class RouteSchema(Schema):
     class Meta:
         unknown = EXCLUDE
     network = fields.String()
+    protocol = fields.String()
     next_hop = fields.String()
     since = fields.String()
     origin = fields.String()
@@ -121,7 +122,7 @@ class ACBirdParser:
     def parse_nested_protocol(text: str):
 
         if not text:
-            return None
+            return
 
         _protocol = {}
 
@@ -151,7 +152,7 @@ class ACBirdParser:
     def parse_nested_protocols_list(text: str):
 
         if not text:
-            return None
+            return
 
         _protocol_list = []
 

@@ -126,6 +126,12 @@ class ACBird:
         try:
             self._socket.connect(self._socket_file)
             logger.debug(f"Socket is initialize with file {self._socket_file} (timeout {self._timeout})")
+        except FileNotFoundError:
+            self._socket = None
+            logger.error(f"Cannot initialize the socket (file: {self._socket_file}) don't exist")
+        except ConnectionRefusedError:
+            self._socket = None
+            logger.error(f"Cannot initialize the socket (file: {self._socket_file}): Connection refused")
         except Exception as e:
             self._socket = None
             logger.error(f"Cannot initialize the socket (file: {self._socket_file}): {e}")
@@ -158,7 +164,7 @@ class ACBird:
 
         if not self._socket:
             result["valid"] = False
-            result["text"] = "No socket connected"
+            result["warning"] = "No socket connected"
             return result
 
         while current_code not in BIRD_RETURN_CODE:

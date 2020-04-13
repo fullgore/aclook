@@ -85,9 +85,13 @@ class ACBirdCommand(ACBird):
         return data.get("valid", False)
 
     def _return_route_parsed_with_data(self, data, detail=False):
+        if not data:
+            logger.debug(f"[Data] = None")
+            return f"No data"
         if not self._is_valid_data(data):
             logger.debug(f"[Data] not valid")
-            return
+            return f"Return cmd is not valid ({data.get('warning')} {data.get('text')}) \
+- Please contact the administrator"
         if detail:
             return ACBirdParser.parse_route_list(data.get("text"))
         else:
@@ -120,7 +124,7 @@ class ACBirdCommand(ACBird):
     def get_route(self, network, detail=False):
         valid_network = self._verify_ip_network(network)
         if not valid_network:
-            return
+            return "Route not valid"
         command = f"show route for {valid_network}"
         if detail:
             command = f"{command} all"
@@ -131,8 +135,10 @@ class ACBirdCommand(ACBird):
     def get_route_from_protocol(self, network, protocol_name, detail=False):
         valid_network = self._verify_ip_network(network)
         valid_protocol_name = self._is_valid_protocol(protocol_name)
-        if not valid_network or not valid_protocol_name:
-            return
+        if not valid_network:
+            return "Route not valid"
+        if not valid_protocol_name:
+            return "Protocol name not valid"
         command = f"show route for {valid_network} protocol {protocol_name}"
         if detail:
             command = f"{command} all"
@@ -143,7 +149,7 @@ class ACBirdCommand(ACBird):
     def get_route_from_asn(self, asn, detail=False):
         valid_asn = self._is_valid_asn(asn)
         if not valid_asn:
-            return
+            return "ASN not valid"
         command = f"show route where bgp_path.first = {asn}"
         if detail:
             command = f"{command} all"
@@ -154,7 +160,7 @@ class ACBirdCommand(ACBird):
     def get_route_origin_asn(self, asn, detail=False):
         valid_asn = self._is_valid_asn(asn)
         if not valid_asn:
-            return
+            return "ASN not valid"
         command = f"show route where bgp_path.last = {asn}"
         if detail:
             command = f"{command} all"
@@ -165,7 +171,7 @@ class ACBirdCommand(ACBird):
     def get_route_with_community(self, community, detail=False):
         valid_community = self._is_valid_community(community)
         if not valid_community:
-            return
+            return "Community not valid"
         command = f"show route where {community} ~ bgp_community"
         if detail:
             command = f"{command} all"
@@ -176,7 +182,7 @@ class ACBirdCommand(ACBird):
     def get_route_with_large_community(self, community, detail=False):
         valid_community = self._is_valid_community(community)
         if not valid_community:
-            return
+            return "Large community not valid"
         command = f"show route where {community} ~ bgp_large_community"
         if detail:
             command = f"{command} all"

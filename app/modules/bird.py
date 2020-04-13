@@ -1,22 +1,31 @@
 
 from flask_restplus import Namespace
 from flask_restplus import Resource
-from flask_restplus import fields
 
 from aclook import appSC
 
-api = Namespace('api/', description="Bird")
+api = Namespace('bird', description="Bird endpoints")
 
-network = api.model('Network', {
-    'network': fields.String(required=True, description="the lookup network"),
-    'asn': fields.Integer(required=True, description="the lookup ASN"),
-    'protocol': fields.String(required=True, description="Focus on protocol name")
-})
+
+@api.route('/asn/<asn>')
+class BirdRouteFromASN(Resource):
+
+    @api.doc(
+        responses={200: 'OK', 500: 'Timeout or internal error'},
+        params={'asn': 'all routes origin this ASN'}
+    )
+    # noinspection PyMethodMayBeStatic
+    def get(self, asn):
+        return appSC.bird_cmd().get_route_origin_asn(asn)
 
 
 @api.route('/network/<network>')
 class BirdRoute(Resource):
 
+    @api.doc(
+        responses={200: 'OK', 500: 'Timeout or internal error'},
+        params={'network': 'Lookup IP or Network'}
+    )
     # noinspection PyMethodMayBeStatic
     def get(self, network):
         return appSC.bird_cmd().get_route(network)
@@ -26,6 +35,10 @@ class BirdRoute(Resource):
 class BirdRouteDetail(Resource):
 
     # noinspection PyMethodMayBeStatic
+    @api.doc(
+        responses={200: 'OK', 500: 'Timeout or internal error'},
+        params={'network': 'Lookup IP or Network'}
+    )
     def get(self, network):
         return appSC.bird_cmd().get_route(network, detail=True)
 
@@ -34,6 +47,13 @@ class BirdRouteDetail(Resource):
 class BirdRouteAndProtocol(Resource):
 
     # noinspection PyMethodMayBeStatic
+    @api.doc(
+        responses={200: 'OK', 500: 'Timeout or internal error'},
+        params={
+            'network': 'Lookup IP or Network',
+            'protocol': 'Protocol (as peer) you want to focus'
+        }
+    )
     def get(self, network, protocol):
         return appSC.bird_cmd().get_route_from_protocol(network, protocol)
 
@@ -42,13 +62,12 @@ class BirdRouteAndProtocol(Resource):
 class BirdRouteAndProtocolDetail(Resource):
 
     # noinspection PyMethodMayBeStatic
+    @api.doc(
+        responses={200: 'OK', 500: 'Timeout or internal error'},
+        params={
+            'network': 'Lookup IP or Network',
+            'protocol': 'Protocol (as peer) you want to focus'
+        }
+    )
     def get(self, network, protocol):
         return appSC.bird_cmd().get_route_from_protocol(network, protocol, detail=True)
-
-
-@api.route('/asn/<asn>')
-class BirdRouteFromASN(Resource):
-
-    # noinspection PyMethodMayBeStatic
-    def get(self, asn):
-        return appSC.bird_cmd().get_route_origin_asn(asn)

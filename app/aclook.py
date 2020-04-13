@@ -4,17 +4,17 @@ from dependency_injector import containers, providers
 
 from utils.ACBirdCommand import ACBirdCommand
 
-aclook_api = Api(
-    version='1.0',
+api_blueprint = Blueprint('api', __name__, url_prefix='/api')
+api = Api(
+    api_blueprint,
+    version='1.0b',
     title="Bird Looking glass",
-    description="Some description",
+    description="Get routes and attributs from bird daemon 2.x",
 )
 
 
 def init_app(app):
-    aclook_api_blueprint = Blueprint('api', __name__, url_prefix='/api/')
-    aclook_api.init_app(app)
-    app.register_blueprint(aclook_api_blueprint)
+    app.register_blueprint(api_blueprint)
 
 
 class AppServiceContainer(containers.DeclarativeContainer):

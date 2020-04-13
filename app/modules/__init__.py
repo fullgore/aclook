@@ -1,7 +1,7 @@
-from aclook import aclook_api
+from aclook import api
 
 
 def init_app(app):
 
     from modules import bird
-    aclook_api.add_namespace(bird.api)
+    api.add_namespace(bird.api)

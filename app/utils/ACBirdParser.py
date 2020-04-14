@@ -294,9 +294,10 @@ class ACBirdParser:
                 network, protocol, origin_asn, since = re_value.group("network", "protocol", "origin_asn", "since")
                 logger.debug(f"[{key}]: {network} - {protocol} - {origin_asn} - {since}")
                 current_network = network
-                _nested_route.append(NestedRoute().dump({
-                    "network": network, "protocol": protocol, "origin_asn": origin_asn, "active": True, "since": since,
-                }))
+                _tmp = {"network": network, "protocol": protocol, "active": True, "since": since}
+                if origin_asn:
+                    _tmp["origin_asn"] = origin_asn
+                _nested_route.append(NestedRoute().dump(_tmp))
 
             if key in ["next_route"]:
                 protocol, origin_asn, since = re_value.group("protocol", "origin_asn", "since")
@@ -304,9 +305,10 @@ class ACBirdParser:
                     continue
                 network = current_network
                 logger.debug(f"[{key}]: {network} - {protocol} - {origin_asn} - {since}")
-                _nested_route.append(NestedRoute().dump({
-                    "network": network, "protocol": protocol, "origin_asn": origin_asn, "since": since,
-                }))
+                _tmp = {"network": network, "protocol": protocol, "active": True, "since": since}
+                if origin_asn:
+                    _tmp["origin_asn"] = origin_asn
+                _nested_route.append(NestedRoute().dump(_tmp))
 
         return NestedRouteListSchema().dump({"routes": _nested_route})
 
@@ -331,7 +333,9 @@ class ACBirdParser:
                 if current_route:
                     route_list.append(RouteSchema().dump(current_route))
                 else:
-                    current_route = {"network": network, "protocol": protocol, "origin_asn": origin_asn, "since": since}
+                    current_route = {"network": network, "protocol": protocol, "active": True, "since": since}
+                    if origin_asn:
+                        current_route["origin_asn"] = origin_asn
 
             if key in ["next_route"]:
                 if not current_route:
@@ -340,7 +344,9 @@ class ACBirdParser:
                 protocol, origin_asn, since = re_value.group("protocol", "origin_asn", "since")
                 logger.debug(f"[{key}]: {network} - {protocol} - {origin_asn} - {since}")
                 route_list.append(RouteSchema().dump(current_route))
-                current_route = {"network": network, "protocol": protocol, "origin_asn": origin_asn, "since": since}
+                current_route = {"network": network, "protocol": protocol, "active": True, "since": since}
+                if origin_asn:
+                    current_route["origin_asn"] = origin_asn
 
             if key in ["med", "local_pref"]:
                 value = re_value.group(key)

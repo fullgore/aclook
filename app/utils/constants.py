@@ -138,10 +138,10 @@ DICT_BIRD_RPKI_PROTOCOL = {
 
 RE_ACTIVE_ROUTE = re.compile(
     r"(?P<network>(.*/\d+)) (?P<via>(unreachable|.*)) \[(?P<protocol>.*) (?P<since>((\d+:\d+:\d+.\d+)|(\d+-\d+-\d+))) "
-    r"from (?P<source>.*)\] (?P<active>.*) \((?P<distance>.*)\) \[AS(?P<origin_asn>\d+)(?P<origin>.*)\]")
+    r"from (?P<source>.*)\] (?P<active>.*) \((?P<distance>.*)\) \[(AS(?P<origin_asn>\d+)|)(?P<origin>.+)\]")
 RE_NEXT_ROUTE = re.compile(
     r"(?P<via>(unreachable|.*)) \[(?P<protocol>.*) (?P<since>((\d+:\d+:\d+.\d+)|(\d+-\d+-\d+))) "
-    r"from (?P<source>.*)\] \((?P<distance>.*)\) \[AS(?P<origin_asn>\d+)(?P<origin>.*)\]")
+    r"from (?P<source>.*)\] \((?P<distance>.*)\) \[(AS(?P<origin_asn>\d+)|)(?P<origin>.+)\]")
 
 DICT_BIRD_NESTED_ROUTE = {
     "active_route": RE_ACTIVE_ROUTE,

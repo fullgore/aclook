@@ -51,7 +51,7 @@ class BirdRoute(Resource):
         params={'network': 'Lookup IP or Network'}
     )
     # noinspection PyMethodMayBeStatisc
-    def get(self, network, mask):
+    def get(self, network, mask=None):
         network = convert_slash(network)
         network = merge_network_and_mask(network, mask)
         return appSC.bird_cmd().get_route(network)
@@ -66,7 +66,7 @@ class BirdRouteDetail(Resource):
         responses={200: 'OK', 500: 'Timeout or internal error'},
         params={'network': 'Lookup IP or Network'}
     )
-    def get(self, network, mask):
+    def get(self, network, mask=None):
         network = convert_slash(network)
         network = merge_network_and_mask(network, mask)
         return appSC.bird_cmd().get_route(network, detail=True)
@@ -101,7 +101,7 @@ class BirdRouteAndProtocolDetail(Resource):
             'protocol': 'Protocol (as peer) you want to focus'
         }
     )
-    def get(self, network, mask, protocol):
+    def get(self, network, protocol, mask=None):
         network = convert_slash(network)
         network = merge_network_and_mask(network, mask)
         return appSC.bird_cmd().get_route_from_protocol(network, protocol, detail=True)
